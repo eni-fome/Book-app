@@ -6,6 +6,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "build": "npm install && npx tsc",
     "dev": "nodemon index.js"
   },
   "keywords": [],
