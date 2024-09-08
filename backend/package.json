@@ -10,7 +10,7 @@
   "dev": "nodemon index.js"
 },
   "keywords": [],
-  "author": "MamadTaheri68",
+  "author": "yginnit",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
