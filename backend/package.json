@@ -4,11 +4,11 @@
   "description": "",
   "type": "module",
   "main": "index.js",
-  "scripts": {
-    "start": "node index.js",
-    "build": "npm install && npx tsc",
-    "dev": "nodemon index.js"
-  },
+"scripts": {
+  "start": "node index.js",
+  "build": "npm install",
+  "dev": "nodemon index.js"
+},
   "keywords": [],
   "author": "MamadTaheri68",
   "license": "ISC",
