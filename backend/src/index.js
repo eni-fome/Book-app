@@ -29,7 +29,7 @@ app.use(express.json());
 
 app.use(
 	cors({
-		origin: "https://liibs.onrender.com/", // This should be your frontend URL
+		origin: "https://liibs.onrender.com", // This should be your frontend URL
 		methods: ["GET", "POST", "PUT", "DELETE"],
 		allowedHeaders: ["Content-Type", "Authorization"],
 	})
