@@ -1,3 +1,4 @@
+// src/models/bookModel.js
 import mongoose from "mongoose";
 
 const bookSchema = new mongoose.Schema(
@@ -26,13 +27,20 @@ const bookSchema = new mongoose.Schema(
 			trim: true,
 			maxlength: [500, "Synopsis cannot be more than 500 characters"],
 		},
+		coverImage: {
+			type: String,
+			default: "",
+		},
+		rating: {
+			type: Number,
+			min: 1,
+			max: 5,
+			default: 0,
+		},
 	},
 	{
 		timestamps: true,
 	}
 );
-
-// Add a text index for searching
-bookSchema.index({ title: "text", author: "text", synopsis: "text" });
 
 export const Book = mongoose.model("Book", bookSchema);

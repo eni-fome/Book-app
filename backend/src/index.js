@@ -1,38 +1,64 @@
 import express from "express";
 import mongoose from "mongoose";
+import cloudinary from "cloudinary";
 import cors from "cors";
 import dotenv from "dotenv";
 import booksRoute from "./routes/booksRoute.js";
 
-// Load environment variables
 dotenv.config();
+cloudinary.config({
+	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+	api_key: process.env.CLOUDINARY_API_KEY,
+	api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+export const uploadToCloudinary = (file) => {
+	return new Promise((resolve, reject) => {
+		cloudinary.uploader.upload(file, (error, result) => {
+			if (error) reject(error);
+			else resolve(result.secure_url);
+		});
+	});
+};
 
 const app = express();
 const PORT = process.env.PORT || 6000;
 const MONGODB_URI = process.env.MONGODB_URI;
 
-// Middleware
 app.use(express.json());
 
-// Routes
-app.use("/api/books", booksRoute);
-
-//cors
 app.use(
 	cors({
-		origin: "*", // Your frontend URL
+		origin: "http://localhost:5173", // This should be your frontend URL
 		methods: ["GET", "POST", "PUT", "DELETE"],
 		allowedHeaders: ["Content-Type", "Authorization"],
 	})
 );
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-	console.error(err.stack);
-	res.status(500).send("Something went wrong!");
+// Logging middleware
+app.use((req, res, next) => {
+	console.log(`${req.method} ${req.url}`);
+	next();
 });
 
-// Database connection
+app.use("/api/books", booksRoute);
+
+// Catch-all route for debugging
+app.use("*", (req, res) => {
+	res.status(404).json({ message: `Route not found: ${req.originalUrl}` });
+});
+
+app.use((err, req, res, next) => {
+	console.error("Error details:", err);
+	res.status(500).json({
+		message: "Something went wrong!",
+		error:
+			process.env.NODE_ENV === "development"
+				? err.message
+				: "Internal server error",
+	});
+});
+
 if (!MONGODB_URI) {
 	console.error("MONGODB_URI is not defined in the environment variables");
 	process.exit(1);
