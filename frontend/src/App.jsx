@@ -4,7 +4,7 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import { SnackbarProvider } from "notistack";
-import Sidebar from "./components/Sidebar";
+import Sidebar from "./components/sidebar";
 import Home from "./pages/Home";
 import CreateBook from "./pages/CreateBooks";
 import ShowBook from "./pages/ShowBook";

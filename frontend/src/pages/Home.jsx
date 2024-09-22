@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Typography, CircularProgress, Container, Grid } from "@mui/material";
 import BookCard from "../components/home/BooksCard";
-import api from "../components/api";
+import { getAllBooks } from "../common/apiClient";  
 import { useSnackbar } from "notistack";
 
 const Home = () => {
@@ -12,10 +12,10 @@ const Home = () => {
 	useEffect(() => {
 		const fetchBooks = async () => {
 			try {
-				console.log("fetching .....");
-				const response = await api.get("/");
+				console.log("Fetching books...");
+				const response = await getAllBooks(); // Use getAllBooks function
 				console.log("Response:", response);
-				setBooks(response.data.data);
+				setBooks(response.data); // Adjust this based on the structure of your response
 				setLoading(false);
 			} catch (error) {
 				console.error("Error fetching books:", error);
