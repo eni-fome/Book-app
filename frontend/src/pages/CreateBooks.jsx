@@ -1,90 +1,109 @@
-import React, { useState } from 'react';
-import BackButton from '../components/BackButton';
-import Spinner from '../components/Spinner';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { useSnackbar } from 'notistack';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSnackbar } from "notistack";
+import { TextField, Button, Container, Typography, Box } from "@mui/material";
+import axios from "axios";
 
-const CreateBooks = () => {
-  const [title, setTitle] = useState('');
-  const [author, setAuthor] = useState('');
-  const [publishYear, setPublishYear] = useState('');
-  const [synopsis, setSynopsis] = useState('');
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-  const { enqueueSnackbar } = useSnackbar();
+const CreateBook = () => {
+	const [book, setBook] = useState({
+		title: "",
+		author: "",
+		publishYear: "",
+		synopsis: "",
+	});
+	const [loading, setLoading] = useState(false);
+	const navigate = useNavigate();
+	const { enqueueSnackbar } = useSnackbar();
 
-  const handleSaveBook = () => {
-    const data = {
-      title,
-      author,
-      publishYear,
-      synopsis,
-    };
-    setLoading(true);
-    axios
-      .post('http://localhost:8081/books', data)
-      .then(() => {
-        setLoading(false);
-        enqueueSnackbar('Book Created successfully', { variant: 'success' });
-        navigate('/');
-      })
-      .catch((error) => {
-        setLoading(false);
-        // alert('An error happened. Please Check console');
-        enqueueSnackbar('Error', { variant: 'error' });
-        console.log(error);
-      });
-  };
+	const handleChange = (e) => {
+		setBook({ ...book, [e.target.name]: e.target.value });
+	};
 
-  return (
-    <div className='p-4'>
-      <BackButton />
-      <h1 className='text-3xl my-4'>Create Book</h1>
-      {loading ? <Spinner /> : ''}
-      <div className='flex flex-col border-2 border-sky-400 rounded-xl w-[600px] p-4 mx-auto'>
-        <div className='my-4'>
-          <label className='text-xl mr-4 text-gray-500'>Title</label>
-          <input
-            type='text'
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className='border-2 border-gray-500 px-4 py-2 w-full'
-          />
-        </div>
-        <div className='my-4'>
-          <label className='text-xl mr-4 text-gray-500'>Author</label>
-          <input
-            type='text'
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-            className='border-2 border-gray-500 px-4 py-2  w-full '
-          />
-        </div>
-        <div className='my-4'>
-          <label className='text-xl mr-4 text-gray-500'>Publish Year</label>
-          <input
-            type='number'
-            value={publishYear}
-            onChange={(e) => setPublishYear(e.target.value)}
-            className='border-2 border-gray-500 px-4 py-2  w-full '
-          />
-        </div>
-        <div className='my-4'>
-          <label className='text-xl mr-4 text-gray-500'>Synopsis</label>
-          <textarea
-            type='text'
-            value={synopsis}
-            onChange={(e) => setSynopsis(e.target.value)}
-            className='border-2 border-gray-500 px-4 py-2  w-full '
-          />
-          </div>
-        <button className='p-2 bg-sky-300 m-8' onClick={handleSaveBook}>
-          Save
-        </button>
-      </div>
-    </div>
-  );
-}
+	const handleSubmit = (e) => {
+		e.preventDefault();
+		setLoading(true);
+		axios
+			.post("http://localhost:6000/api/books", book)
+			.then(() => {
+				setLoading(false);
+				enqueueSnackbar("Book created successfully", { variant: "success" });
+				navigate("/");
+			})
+			.catch((error) => {
+				setLoading(false);
+				enqueueSnackbar("Error creating book", { variant: "error" });
+				console.log(error);
+			});
+	};
 
-export default CreateBooks
+	return (
+		<Container maxWidth="sm">
+			<Typography
+				variant="h4"
+				component="h1"
+				gutterBottom>
+				Create New Book
+			</Typography>
+			<Box
+				component="form"
+				onSubmit={handleSubmit}
+				noValidate
+				sx={{ mt: 1 }}>
+				<TextField
+					margin="normal"
+					required
+					fullWidth
+					id="title"
+					label="Title"
+					name="title"
+					autoFocus
+					value={book.title}
+					onChange={handleChange}
+				/>
+				<TextField
+					margin="normal"
+					required
+					fullWidth
+					id="author"
+					label="Author"
+					name="author"
+					value={book.author}
+					onChange={handleChange}
+				/>
+				<TextField
+					margin="normal"
+					required
+					fullWidth
+					id="publishYear"
+					label="Publish Year"
+					name="publishYear"
+					type="number"
+					value={book.publishYear}
+					onChange={handleChange}
+				/>
+				<TextField
+					margin="normal"
+					required
+					fullWidth
+					id="synopsis"
+					label="Synopsis"
+					name="synopsis"
+					multiline
+					rows={4}
+					value={book.synopsis}
+					onChange={handleChange}
+				/>
+				<Button
+					type="submit"
+					fullWidth
+					variant="contained"
+					sx={{ mt: 3, mb: 2 }}
+					disabled={loading}>
+					{loading ? "Creating..." : "Create Book"}
+				</Button>
+			</Box>
+		</Container>
+	);
+};
+
+export default CreateBook;

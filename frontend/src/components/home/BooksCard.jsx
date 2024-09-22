@@ -1,19 +1,50 @@
-import { Link } from 'react-router-dom';
-import { PiBookOpenTextLight } from 'react-icons/pi';
-import { BiUserCircle } from 'react-icons/bi';
-import { AiOutlineEdit } from 'react-icons/ai';
-import { BsInfoCircle } from 'react-icons/bs';
-import { MdOutlineDelete } from 'react-icons/md';
-import BookSingleCard from './BookSingleCard';
+import React from "react";
+import {
+	Card,
+	CardContent,
+	CardActions,
+	Typography,
+	Button,
+} from "@mui/material";
+import { Link } from "react-router-dom";
 
-const BooksCard = ({ books }) => {
-  return (
-    <div className='grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
-      {books.map((item) => (
-        <BookSingleCard key={item._id} book={item} />
-      ))}
-    </div>
-  );
+const BookCard = ({ book }) => {
+	return (
+		<Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+			<CardContent sx={{ flexGrow: 1 }}>
+				<Typography
+					gutterBottom
+					variant="h5"
+					component="div">
+					{book.title}
+				</Typography>
+				<Typography
+					variant="body2"
+					color="text.secondary">
+					By {book.author}
+				</Typography>
+				<Typography
+					variant="body2"
+					color="text.secondary">
+					Published: {book.publishYear}
+				</Typography>
+			</CardContent>
+			<CardActions>
+				<Button
+					size="small"
+					component={Link}
+					to={`/books/details/${book._id}`}>
+					View Details
+				</Button>
+				<Button
+					size="small"
+					component={Link}
+					to={`/books/edit/${book._id}`}>
+					Edit
+				</Button>
+			</CardActions>
+		</Card>
+	);
 };
 
-export default BooksCard;
+export default BookCard;

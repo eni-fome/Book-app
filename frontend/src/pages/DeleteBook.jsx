@@ -1,50 +1,147 @@
-import React, { useState } from 'react';
-import BackButton from '../components/BackButton';
-import Spinner from '../components/Spinner';
-import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useSnackbar } from 'notistack';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useSnackbar } from "notistack";
+import {
+	TextField,
+	Button,
+	Container,
+	Typography,
+	Box,
+	CircularProgress,
+} from "@mui/material";
+import axios from "axios";
 
-const DeleteBook = () => {
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-  const { id } = useParams();
-  const { enqueueSnackbar } = useSnackbar();
+const EditBook = () => {
+	const [book, setBook] = useState({
+		title: "",
+		author: "",
+		publishYear: "",
+		synopsis: "",
+	});
+	const [loading, setLoading] = useState(false);
+	const [fetchingBook, setFetchingBook] = useState(true);
+	const navigate = useNavigate();
+	const { id } = useParams();
+	const { enqueueSnackbar } = useSnackbar();
 
-  const handleDeleteBook = () => {
-    setLoading(true);
-    axios
-      .delete(`http://localhost:8081/books/${id}`)
-      .then(() => {
-        setLoading(false);
-        enqueueSnackbar('Book Deleted successfully', { variant: 'success' });
-        navigate('/');
-      })
-      .catch((error) => {
-        setLoading(false);
-        // alert('An error happened. Please Chack console');
-        enqueueSnackbar('Error', { variant: 'error' });
-        console.log(error);
-      });
-  };
-  
-  return (
-    <div className='p-4'>
-      <BackButton />
-      <h1 className='text-3xl my-4'>Delete Book</h1>
-      {loading ? <Spinner /> : ''}
-      <div className='flex flex-col items-center border-2 border-sky-400 rounded-xl w-[600px] p-8 mx-auto'>
-        <h3 className='text-2xl'>Are You Sure You want to delete this book?</h3>
+	useEffect(() => {
+		setFetchingBook(true);
+		axios
+			.get(`http://localhost:6000/api/books/${id}`)
+			.then((response) => {
+				setBook(response.data);
+				setFetchingBook(false);
+			})
+			.catch((error) => {
+				console.log(error);
+				setFetchingBook(false);
+				enqueueSnackbar("Error fetching book details", { variant: "error" });
+			});
+	}, [id, enqueueSnackbar]);
 
-        <button
-          className='p-4 bg-red-600 text-white m-8 w-full'
-          onClick={handleDeleteBook}
-        >
-          Yes, Delete it
-        </button>
-      </div>
-    </div>
-  )
-}
+	const handleChange = (e) => {
+		setBook({ ...book, [e.target.name]: e.target.value });
+	};
 
-export default DeleteBook;
+	const handleSubmit = (e) => {
+		e.preventDefault();
+		setLoading(true);
+		axios
+			.put(`http://localhost:6000/api/books/${id}`, book)
+			.then(() => {
+				setLoading(false);
+				enqueueSnackbar("Book updated successfully", { variant: "success" });
+				navigate("/");
+			})
+			.catch((error) => {
+				setLoading(false);
+				enqueueSnackbar("Error updating book", { variant: "error" });
+				console.log(error);
+			});
+	};
+
+	if (fetchingBook) {
+		return (
+			<Container
+				sx={{
+					display: "flex",
+					justifyContent: "center",
+					alignItems: "center",
+					height: "100vh",
+				}}>
+				<CircularProgress />
+			</Container>
+		);
+	}
+
+	return (
+		<Container maxWidth="sm">
+			<Typography
+				variant="h4"
+				component="h1"
+				gutterBottom>
+				Edit Book
+			</Typography>
+			<Box
+				component="form"
+				onSubmit={handleSubmit}
+				noValidate
+				sx={{ mt: 1 }}>
+				<TextField
+					margin="normal"
+					required
+					fullWidth
+					id="title"
+					label="Title"
+					name="title"
+					autoFocus
+					value={book.title}
+					onChange={handleChange}
+				/>
+				<TextField
+					margin="normal"
+					required
+					fullWidth
+					id="author"
+					label="Author"
+					name="author"
+					value={book.author}
+					onChange={handleChange}
+				/>
+				<TextField
+					margin="normal"
+					required
+					fullWidth
+					id="publishYear"
+					label="Publish Year"
+					name="publishYear"
+					type="number"
+					value={book.publishYear}
+					onChange={handleChange}
+				/>
+				<TextField
+					margin="normal"
+					required
+					fullWidth
+					id="synopsis"
+					label="Synopsis"
+					name="synopsis"
+					multiline
+					rows={4}
+					value={book.synopsis}
+					onChange={handleChange}
+				/>
+				<Button
+					type="submit"
+					fullWidth
+					variant="contained"
+					sx={{ mt: 3, mb: 2 }}
+					disabled={loading}>
+					{loading ? "Updating..." : "Update Book"}
+				</Button>
+			</Box>
+		</Container>
+	);
+};
+
+export default EditBook;
