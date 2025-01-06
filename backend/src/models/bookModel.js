@@ -25,7 +25,6 @@ const bookSchema = new mongoose.Schema(
 			type: String,
 			required: [true, "Book synopsis is required"],
 			trim: true,
-			maxlength: [500, "Synopsis cannot be more than 500 characters"],
 		},
 		coverImage: {
 			type: String,

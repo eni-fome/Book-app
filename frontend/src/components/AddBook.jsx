@@ -1,30 +1,106 @@
-// src/components/AddBook.jsx
 import React, { useState } from "react";
+import { TextField, Button, Container, Typography, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import api from "../utils/api";
-import BookForm from "./BookForm";
+import { useSnackbar } from "notistack";
+import { createBook } from "../utils/api";
 
-const AddBook = () => {
+const CreateBooks = () => {
+	const [book, setBook] = useState({
+		title: "",
+		author: "",
+		publishYear: "",
+		synopsis: "",
+	});
+	const [loading, setLoading] = useState(false);
 	const navigate = useNavigate();
-	const [error, setError] = useState(null);
+	const { enqueueSnackbar } = useSnackbar();
 
-	const handleSubmit = async (bookData) => {
+	const handleChange = (e) => {
+		setBook({ ...book, [e.target.name]: e.target.value });
+	};
+
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		setLoading(true);
 		try {
-			await api.post("/books", bookData);
+			await createBook(book);
+			enqueueSnackbar("Book created successfully", { variant: "success" });
 			navigate("/");
-		} catch (err) {
-			setError("Failed to add book. Please try again.");
-			console.error("Error adding book:", err);
+		} catch (error) {
+			enqueueSnackbar("Error creating book", { variant: "error" });
+		} finally {
+			setLoading(false);
 		}
 	};
 
 	return (
-		<div className="max-w-2xl mx-auto">
-			<h1 className="text-3xl font-serif text-amber-900 mb-6">Add New Book</h1>
-			{error && <div className="text-red-600 mb-4">{error}</div>}
-			<BookForm onSubmit={handleSubmit} />
-		</div>
+		<Container maxWidth="sm">
+			<Typography
+				variant="h4"
+				component="h1"
+				gutterBottom>
+				Create New Book
+			</Typography>
+			<Box
+				component="form"
+				onSubmit={handleSubmit}
+				noValidate
+				sx={{ mt: 1 }}>
+				<TextField
+					margin="normal"
+					required
+					fullWidth
+					id="title"
+					label="Title"
+					name="title"
+					autoFocus
+					value={book.title}
+					onChange={handleChange}
+				/>
+				<TextField
+					margin="normal"
+					required
+					fullWidth
+					id="author"
+					label="Author"
+					name="author"
+					value={book.author}
+					onChange={handleChange}
+				/>
+				<TextField
+					margin="normal"
+					required
+					fullWidth
+					id="publishYear"
+					label="Publish Year"
+					name="publishYear"
+					type="number"
+					value={book.publishYear}
+					onChange={handleChange}
+				/>
+				<TextField
+					margin="normal"
+					required
+					fullWidth
+					id="synopsis"
+					label="Synopsis"
+					name="synopsis"
+					multiline
+					rows={4}
+					value={book.synopsis}
+					onChange={handleChange}
+				/>
+				<Button
+					type="submit"
+					fullWidth
+					variant="contained"
+					sx={{ mt: 3, mb: 2 }}
+					disabled={loading}>
+					{loading ? "Creating..." : "Create Book"}
+				</Button>
+			</Box>
+		</Container>
 	);
 };
 
-export default AddBook;
+export default CreateBooks;
